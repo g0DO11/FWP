@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">FWP</string>
+    <string name="draw_card">버리기</string>
+    <string name="use_card">공격하기</string>
 </resources>
