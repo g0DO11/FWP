@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/battle"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#00FFFFFF">
@@ -98,10 +99,12 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginEnd="16dp">
+
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/circle_gray" />
+
             <TextView
                 android:id="@+id/turn_textbox"
                 android:layout_width="wrap_content"
@@ -109,8 +112,8 @@
                 android:layout_gravity="center"
                 android:text="턴"
                 android:textAlignment="center"
-                android:textSize="24sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:textSize="24sp" />
         </FrameLayout>
 
         <ImageView
@@ -126,8 +129,8 @@
         android:id="@+id/sortbtn_group"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_marginEnd="32dp"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="@+id/card_inhand_1"
         app:layout_constraintEnd_toStartOf="@+id/card_inhand_1">
 
@@ -141,33 +144,37 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/circle_gray" />
+
             <ImageView
                 android:layout_width="16dp"
                 android:layout_height="16dp"
-                android:src="@drawable/suit_heart"
                 android:layout_marginStart="11dp"
-                android:layout_marginTop="11dp"/>
+                android:layout_marginTop="11dp"
+                android:src="@drawable/suit_heart" />
+
             <ImageView
                 android:layout_width="16dp"
                 android:layout_height="16dp"
-                android:src="@drawable/suit_water"
                 android:layout_gravity="right"
+                android:layout_marginTop="11dp"
                 android:layout_marginEnd="11dp"
-                android:layout_marginTop="11dp"/>
+                android:src="@drawable/suit_water" />
+
             <ImageView
                 android:layout_width="16dp"
                 android:layout_height="16dp"
-                android:src="@drawable/suit_wind1"
                 android:layout_gravity="bottom"
                 android:layout_marginStart="11dp"
-                android:layout_marginBottom="11dp"/>
+                android:layout_marginBottom="11dp"
+                android:src="@drawable/suit_wind1" />
+
             <ImageView
                 android:layout_width="16dp"
                 android:layout_height="16dp"
-                android:src="@drawable/suit_leaf"
                 android:layout_gravity="right|bottom"
                 android:layout_marginEnd="11dp"
-                android:layout_marginBottom="11dp"/>
+                android:layout_marginBottom="11dp"
+                android:src="@drawable/suit_leaf" />
         </FrameLayout>
 
         <FrameLayout
@@ -188,9 +195,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
-        android:visibility="invisible">
+        app:layout_constraintTop_toTopOf="parent">
+
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -208,39 +216,42 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/suit_heart"
                 android:layout_gravity="left|center_vertical"
-                android:layout_marginStart="8dp"/>
+                android:layout_marginStart="8dp"
+                android:src="@drawable/suit_heart" />
 
             <TextView
                 android:id="@+id/health_point"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="100"
-                android:textSize="24sp"
-                android:textAlignment="textEnd"/>
+                android:textAlignment="textEnd"
+                android:textSize="24sp" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/coins"
                 android:layout_gravity="left|center_vertical"
-                android:layout_marginStart="8dp"/>
+                android:layout_marginStart="8dp"
+                android:src="@drawable/coins" />
+
             <TextView
                 android:id="@+id/wealth_point"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="20"
-                android:textSize="24sp"
-                android:textAlignment="textEnd"/>
+                android:textAlignment="textEnd"
+                android:textSize="24sp" />
         </LinearLayout>
     </LinearLayout>
 
@@ -285,85 +296,85 @@
             android:src="@drawable/suit_leaf" />
     </FrameLayout>
 
-        <FrameLayout
-            android:id="@+id/card_inhand_2"
+    <FrameLayout
+        android:id="@+id/card_inhand_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        app:layout_constraintBottom_toBottomOf="@id/card_inhand_1"
+        app:layout_constraintStart_toStartOf="@id/card_inhand_1">
+
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="40dp"
-            app:layout_constraintBottom_toBottomOf="@id/card_inhand_1"
-            app:layout_constraintStart_toStartOf="@id/card_inhand_1">
+            android:src="@drawable/bg_card" />
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/bg_card" />
-
-            <TextView
-                android:id="@+id/card_inhnad2_rank"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="4dp"
-                android:text="10"
-                android:textAlignment="center"
-                android:textSize="20sp" />
-
-            <ImageView
-                android:id="@+id/card_inhand2_img"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:src="@drawable/eg_potato_72_72" />
-
-            <ImageView
-                android:id="@+id/card_inhnad2_suit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_marginStart="4dp"
-                android:layout_marginBottom="4dp"
-                android:src="@drawable/suit_leaf" />
-        </FrameLayout>
-
-        <FrameLayout
-            android:id="@+id/card_inhand_3"
+        <TextView
+            android:id="@+id/card_inhnad2_rank"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="40dp"
-            app:layout_constraintBottom_toBottomOf="@id/card_inhand_2"
-            app:layout_constraintStart_toStartOf="@id/card_inhand_2">
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            android:text="10"
+            android:textAlignment="center"
+            android:textSize="20sp" />
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/bg_card" />
+        <ImageView
+            android:id="@+id/card_inhand2_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/eg_potato_72_72" />
 
-            <TextView
-                android:id="@+id/card_inhnad3_rank"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="4dp"
-                android:text="10"
-                android:textAlignment="center"
-                android:textSize="20sp" />
+        <ImageView
+            android:id="@+id/card_inhnad2_suit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginStart="4dp"
+            android:layout_marginBottom="4dp"
+            android:src="@drawable/suit_leaf" />
+    </FrameLayout>
 
-            <ImageView
-                android:id="@+id/card_inhand3_img"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:src="@drawable/eg_potato_72_72" />
+    <FrameLayout
+        android:id="@+id/card_inhand_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        app:layout_constraintBottom_toBottomOf="@id/card_inhand_2"
+        app:layout_constraintStart_toStartOf="@id/card_inhand_2">
 
-            <ImageView
-                android:id="@+id/card_inhnad3_suit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_marginStart="4dp"
-                android:layout_marginBottom="4dp"
-                android:src="@drawable/suit_leaf" />
-        </FrameLayout>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/bg_card" />
+
+        <TextView
+            android:id="@+id/card_inhnad3_rank"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            android:text="10"
+            android:textAlignment="center"
+            android:textSize="20sp" />
+
+        <ImageView
+            android:id="@+id/card_inhand3_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/eg_potato_72_72" />
+
+        <ImageView
+            android:id="@+id/card_inhnad3_suit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginStart="4dp"
+            android:layout_marginBottom="4dp"
+            android:src="@drawable/suit_leaf" />
+    </FrameLayout>
 
     <FrameLayout
         android:id="@+id/card_inhand_4"
@@ -564,12 +575,13 @@
             android:layout_marginBottom="4dp"
             android:src="@drawable/suit_leaf" />
     </FrameLayout>
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="20dp" />
+        app:layout_constraintGuide_begin="22dp" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline2"
