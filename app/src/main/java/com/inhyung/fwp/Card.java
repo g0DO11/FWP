@@ -1,18 +1,34 @@
 package com.inhyung.fwp;
 
 public class Card {
-    int card_num; //1~13
-    int card_suit; //0 = heart, 1 = droplet(물방울모양), 2= wind, 3=leaf
+    private int number;     // 1 ~ 13
+    private int suit;       // 0 = heart, 1 = droplet, 2 = wind, 3 = leaf
+
     public Card(int number, int suit) {
-        this.card_num = number;
-        this.card_suit = suit;
+        this.number = number;
+        this.suit = suit;
     }
 
     public int getNumber() {
-        return card_num;
+        return number;
     }
 
-    public int getSuit() {
-        return card_suit;
+    public String getSuit() {
+        return suitToString(this.suit);
+    }
+
+    @Override
+    public String toString() {
+        return number + " of " + suitToString(suit);
+    }
+
+    private String suitToString(int suit) {
+        switch (suit) {
+            case 0: return "Heart";
+            case 1: return "Droplet";
+            case 2: return "Leaf";
+            case 3: return "Wind";
+            default: return "Unknown";
+        }
     }
 }
