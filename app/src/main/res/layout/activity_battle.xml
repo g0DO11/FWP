@@ -227,7 +227,7 @@
             <TextView
                 android:id="@+id/health_point"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:text="100"
                 android:textAlignment="textEnd"
                 android:textSize="24sp" />
