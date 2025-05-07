@@ -9,7 +9,7 @@ public class Hand {
         cards = new ArrayList<>();
     }
 
-    public void drawFromDeck(Deck deck, int count) {
+    public void drawFromDeck(Deck deck, int count) { //count개의 카드를 패로 가져옴
         for (int i = 0; i < count; i++) {
             if (!deck.isEmpty()) {
                 cards.add(deck.draw());

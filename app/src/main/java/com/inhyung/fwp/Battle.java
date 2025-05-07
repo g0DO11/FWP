@@ -22,10 +22,13 @@ public class Battle extends AppCompatActivity {
     private Hand hand;
     private DiscardPile discardPile;
 
+
     // 카드 슬롯에 대응하는 뷰들
     private FrameLayout[] cardSlots = new FrameLayout[8];
     private TextView[] cardRanks = new TextView[8];
     private ImageView[] cardSuits = new ImageView[8];
+    private boolean[] cardSelected = new boolean[8]; // 카드 선택 여부 추적
+
 
     // 무늬에 따른 이미지 리소스 매핑
     private int getSuitDrawable(String suit) {
@@ -38,7 +41,7 @@ public class Battle extends AppCompatActivity {
         }
     }
 
-    private void updateHandDisplay() {
+    private void updateHandDisplay() { //패 상태 업데이트
         ArrayList<Card> cards = hand.getCards();
         for (int i = 0; i < cardSlots.length; i++) {
             if (i < cards.size()) {
@@ -52,6 +55,7 @@ public class Battle extends AppCompatActivity {
         }
     }
 
+    // 카드 뷰를 XML에서 초기화
     private void initCardViews() {
         cardSlots[0] = findViewById(R.id.card_inhand_1);
         cardSlots[1] = findViewById(R.id.card_inhand_2);
@@ -81,6 +85,18 @@ public class Battle extends AppCompatActivity {
         cardSuits[7] = findViewById(R.id.card_inhnad8_suit);
     }
 
+    private void setupCardClickListenersWithAnimation() {
+        for (int i = 0; i < cardSlots.length; i++) {
+            int index = i;
+            cardSlots[i].setOnClickListener(v -> {
+                float targetY = cardSelected[index] ? 0f : -30f;
+                cardSlots[index].animate().translationY(targetY).setDuration(150).start();
+                cardSelected[index] = !cardSelected[index];
+            });
+        }
+    }
+
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
@@ -106,25 +122,62 @@ public class Battle extends AppCompatActivity {
         hand = new Hand();
         discardPile = new DiscardPile();
 
-        initCardViews();
-        updateHandDisplay(); // 처음에는 아무것도 안보이게
+        initCardViews(); //카드 뷰 초기화
+        hand.drawFromDeck(deck, 8); //처음 패 미리 draw 해둠
+        setupCardClickListenersWithAnimation(); //카드 애니메이션 설정
+        updateHandDisplay();
 
+        //버리기 버튼
+        //선택됐는지 확인, 인덱스 저장 후 그 인덱스의 카드 discardpile로 보내고 그 자리에 새로운 카드 draw
         Button drawCardBtn = findViewById(R.id.drawCard_btn);
         drawCardBtn.setOnClickListener(v -> {
-            if (!deck.isEmpty() && hand.getCards().size() < 8) {
-                hand.drawFromDeck(deck, 1);
-                updateHandDisplay();
+            for (int i = 0; i < cardSlots.length; i++) {
+                if (cardSelected[i]) {
+                    // 1. 카드 버리기
+                    Card used = hand.getCards().remove(i);
+                    discardPile.discard(used);
+
+                    // 2. 새로운 카드 뽑기
+                    hand.drawFromDeck(deck, 1);
+
+                    // 3. 선택 상태 초기화
+                    cardSelected[i] = false;
+                    cardSlots[i].setTranslationY(0); // 원위치로 이동
+
+                    // 4. 화면 갱신
+                    updateHandDisplay();
+                }
             }
         });
 
+        //공격하기 버튼
         Button useCardBtn = findViewById(R.id.useCard_btn);
+
+        ArrayList<Card> selectedcards = new ArrayList<>();
+
         useCardBtn.setOnClickListener(v -> {
-            if (!hand.getCards().isEmpty()) {
-                // 첫 번째 카드를 버리는 예시
-                Card used = hand.getCards().remove(0);
-                discardPile.discard(used);
-                updateHandDisplay();
+            for (int i = 0; i < cardSlots.length; i++) {
+                if (cardSelected[i]) {
+                    //0. 선택된 카드를 저장하는 배열 하나 추가
+                    selectedcards.add(hand.getCards().get(i));
+
+                    // 1. 카드 버리기
+                    Card used = hand.getCards().remove(i);
+                    discardPile.discard(used);
+
+                    // 2. 새로운 카드 뽑기
+                    hand.drawFromDeck(deck, 1);
+
+                    // 3. 선택 상태 초기화
+                    cardSelected[i] = false;
+                    cardSlots[i].setTranslationY(0); // 원위치로 이동
+
+                    // 4. 화면 갱신
+                    updateHandDisplay();
+                }
             }
+
+
         });
     }
 }

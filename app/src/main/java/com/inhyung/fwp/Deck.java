@@ -6,7 +6,7 @@ import java.util.Collections;
 public class Deck {
     private ArrayList<Card> cards;
 
-    public Deck() {
+    public Deck() { //전체 카드 배열
         cards = new ArrayList<>();
         for (int suit = 0; suit < 4; suit++) {
             for (int num = 1; num <= 13; num++) {
@@ -18,7 +18,7 @@ public class Deck {
 
     public void shuffle() { //무작위 순서로 섞음
         Collections.shuffle(cards);
-    }
+    } //셔플 : 말 그대로 배열 섞어줌
 
     public Card draw() {
         if (cards.isEmpty()) return null;
