@@ -12,7 +12,8 @@ public class DmgEvaluator {
     public static int evaluate(List<Card> cards) {
         if (isFlush(cards)) return 100;
         if (isStraight(cards)) return 80;
-        if (isPair(cards)) return 50;
+        if (isNumPair(cards)) return 50;
+        if(isSuitPair(cards)) return 30;
         return 20; // 기본값
     }
 
@@ -45,10 +46,21 @@ public class DmgEvaluator {
     }
 
 
-    private static boolean isPair(List<Card> cards) {
+    private static boolean isNumPair(List<Card> cards) {
         Map<Integer, Integer> map = new HashMap<>();
         for (Card c : cards) {
             map.put(c.getNumber(), map.getOrDefault(c.getNumber(), 0) + 1);
+        }
+        for (int val : map.values()) {
+            if (val >= 2) return true;
+        }
+        return false;
+    }
+
+    private static boolean isSuitPair(List<Card> cards) {
+        Map<Integer, Integer> map = new HashMap<>();
+        for (Card c : cards) {
+            map.put(c.getSuitInt(), map.getOrDefault(c.getSuitInt(), 0) + 1);
         }
         for (int val : map.values()) {
             if (val >= 2) return true;

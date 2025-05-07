@@ -150,33 +150,24 @@ public class Battle extends AppCompatActivity {
             }
         });
 
+
+        TextView family_damage_textbox = findViewById(R.id.family_damage_textbox);
         //공격하기 버튼
         Button useCardBtn = findViewById(R.id.useCard_btn);
-
-        ArrayList<Card> selectedcards = new ArrayList<>();
-
         useCardBtn.setOnClickListener(v -> {
+            ArrayList<Card> selectedcards = new ArrayList<>();
             for (int i = 0; i < cardSlots.length; i++) {
                 if (cardSelected[i]) {
                     //0. 선택된 카드를 저장하는 배열 하나 추가
                     selectedcards.add(hand.getCards().get(i));
-
-                    // 1. 카드 버리기
-                    Card used = hand.getCards().remove(i);
-                    discardPile.discard(used);
-
-                    // 2. 새로운 카드 뽑기
-                    hand.drawFromDeck(deck, 1);
-
-                    // 3. 선택 상태 초기화
-                    cardSelected[i] = false;
-                    cardSlots[i].setTranslationY(0); // 원위치로 이동
-
-                    // 4. 화면 갱신
-                    updateHandDisplay();
                 }
             }
-
+            if (selectedcards.isEmpty()) {
+                family_damage_textbox.setText("카드를 선택하세요!");
+            }else{
+                //선택된 카드의 데미지 계산해서 보여줌, evaluate는 int니까 string으로 넘겨주고.
+                family_damage_textbox.setText(String.valueOf(DmgEvaluator.evaluate(selectedcards)));
+            }
 
         });
     }
