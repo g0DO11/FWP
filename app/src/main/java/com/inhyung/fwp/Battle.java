@@ -133,21 +133,24 @@ public class Battle extends AppCompatActivity {
         drawCardBtn.setOnClickListener(v -> {
             for (int i = 0; i < cardSlots.length; i++) {
                 if (cardSelected[i]) {
-                    // 1. 카드 버리기
-                    Card used = hand.getCards().remove(i);
+                    // 1. 카드 버리기: discardPile로 보내기만 하고 손패에서 제거 X
+                    Card used = hand.getCards().get(i);
                     discardPile.discard(used);
 
-                    // 2. 새로운 카드 뽑기
-                    hand.drawFromDeck(deck, 1);
+                    // 2. 새로운 카드 뽑아서 해당 위치에 교체
+                    if (!deck.isEmpty()) {
+                        Card newCard = deck.draw();
+                        hand.getCards().set(i, newCard);  // remove 대신 set
+                    }
 
                     // 3. 선택 상태 초기화
                     cardSelected[i] = false;
                     cardSlots[i].setTranslationY(0); // 원위치로 이동
-
-                    // 4. 화면 갱신
-                    updateHandDisplay();
                 }
             }
+            // 4. UI 갱신
+            updateHandDisplay();
+
         });
 
 
