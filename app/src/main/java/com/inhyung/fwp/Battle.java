@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +16,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class Battle extends AppCompatActivity {
 
@@ -85,14 +88,43 @@ public class Battle extends AppCompatActivity {
         cardSuits[7] = findViewById(R.id.card_inhnad8_suit);
     }
 
+
     private void setupCardClickListenersWithAnimation() {
         for (int i = 0; i < cardSlots.length; i++) {
             int index = i;
             cardSlots[i].setOnClickListener(v -> {
-                float targetY = cardSelected[index] ? 0f : -30f;
-                cardSlots[index].animate().translationY(targetY).setDuration(150).start();
-                cardSelected[index] = !cardSelected[index];
+
+                // 현재 선택된 카드 수 세기
+                int selectedCount = 0;
+                for (boolean selected : cardSelected) {
+                    if (selected) selectedCount++;
+                }
+
+                // 선택 해제
+                if (cardSelected[index]) {
+                    cardSelected[index] = false;
+                    cardSlots[index].animate().translationY(0f).setDuration(150).start();
+                }
+                // 새로 선택하려고 하는 경우
+                else {
+                    if (selectedCount >= 5) {
+                        // 선택 제한
+                        Toast.makeText(this, "최대 5장까지만 선택할 수 있습니다.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    cardSelected[index] = true;
+                    cardSlots[index].animate().translationY(-30f).setDuration(150).start();
+                }
             });
+        }
+    }
+
+
+    //모든 카드 선택 초기화 함수
+    private void resetCardSelection() {
+        for (int i = 0; i < cardSelected.length; i++) {
+            cardSelected[i] = false;
+            cardSlots[i].setTranslationY(0); // 원위치로 이동
         }
     }
 
@@ -126,6 +158,35 @@ public class Battle extends AppCompatActivity {
         hand.drawFromDeck(deck, 8); //처음 패 미리 draw 해둠
         setupCardClickListenersWithAnimation(); //카드 애니메이션 설정
         updateHandDisplay();
+
+        //문양 정렬 버튼
+        FrameLayout sortBySuitBtn = findViewById(R.id.sortBySuit_btn);
+        sortBySuitBtn.setOnClickListener(v -> {
+            Collections.sort(hand.getCards(), (c1, c2) -> {
+                if (c1.getSuitInt() == c2.getSuitInt()) {
+                    return Integer.compare(c1.getNumber(), c2.getNumber()); // 같은 문양이면 숫자순
+                } else {
+                    return Integer.compare(c1.getSuitInt(), c2.getSuitInt()); // 문양 기준 정렬
+                }
+            });
+            resetCardSelection();
+            updateHandDisplay(); // 정렬 후 화면 갱신
+        });
+
+
+        //숫자 정렬 버튼
+        FrameLayout sortByNumberBtn = findViewById(R.id.sortByNum_btn);
+        sortByNumberBtn.setOnClickListener(v -> {
+            Collections.sort(hand.getCards(), (c1, c2) -> {
+                if (c1.getNumber() == c2.getNumber()) {
+                    return Integer.compare(c1.getSuitInt(), c2.getSuitInt()); // 같은 숫자면 문양순
+                } else {
+                    return Integer.compare(c1.getNumber(), c2.getNumber()); // 숫자 기준 정렬
+                }
+            });
+            resetCardSelection();
+            updateHandDisplay(); // 정렬 후 화면 갱신
+        });
 
         //버리기 버튼
         //선택됐는지 확인, 인덱스 저장 후 그 인덱스의 카드 discardpile로 보내고 그 자리에 새로운 카드 draw
@@ -168,7 +229,7 @@ public class Battle extends AppCompatActivity {
             if (selectedcards.isEmpty()) {
                 family_damage_textbox.setText("카드를 선택하세요!");
             }else{
-                //선택된 카드의 데미지 계산해서 보여줌, evaluate는 int니까 string으로 넘겨주고.
+                //선택된 카드의 데미지 계산을 해서 보여줌, evaluate는 int니까 string으로 넘겨주고.
                 family_damage_textbox.setText(String.valueOf(DmgEvaluator.evaluate(selectedcards)));
             }
 

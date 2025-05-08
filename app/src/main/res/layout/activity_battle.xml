@@ -153,6 +153,14 @@
                 android:src="@drawable/suit_heart" />
 
             <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="11dp"
+                android:layout_marginTop="11dp"
+                android:src="@drawable/suit_heart" />
+
+            <ImageView
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_gravity="right"
@@ -187,6 +195,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/circle_gray" />
+
         </FrameLayout>
     </LinearLayout>
 
