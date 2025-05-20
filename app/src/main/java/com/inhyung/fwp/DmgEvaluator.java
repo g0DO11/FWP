@@ -13,40 +13,57 @@ public class DmgEvaluator {
         return dmg;
     }
 
-    public static int evaluate(List<Card> cards) {
+    public static HandResult evaluate(List<Card> cards) {
         HandInfo info = analyzeHand(cards);
         int baseDmg = cardDmg(cards);
 
         int maxSameNumber = Collections.max(info.numberCount.values());
         int pairCount = (int) info.numberCount.values().stream().filter(v -> v == 2).count();
-        //val == 2인, 즉 pair인 애들만 셌음.
+
+        String name;
+        int score;
 
         if (info.isFlush && info.isStraight && isTopStraight(info.sortedNumbers)) {
-            return 500 + baseDmg; // 로얄 스트레이트 플러쉬
+            name = "로얄 스트레이트 플러쉬";
+            score = 500;
         } else if (info.isFlush && info.isStraight && isLowStraight(info.sortedNumbers)) {
-            return 400 + baseDmg; // 백 스트레이트 플러쉬
+            name = "백 스트레이트 플러쉬";
+            score = 400;
         } else if (info.isFlush && info.isStraight) {
-            return 400 + baseDmg; // 스트레이트 플러쉬
+            name = "스트레이트 플러쉬";
+            score = 400;
         } else if (maxSameNumber == 4) {
-            return 350 + baseDmg; // 포커
+            name = "포카드";
+            score = 350;
         } else if (maxSameNumber == 3 && pairCount == 1) {
-            return 300 + baseDmg; // 풀 하우스
+            name = "풀 하우스";
+            score = 300;
         } else if (info.isFlush) {
-            return 200 + baseDmg; // 플러쉬
+            name = "플러쉬";
+            score = 200;
         } else if (isLowStraight(info.sortedNumbers)) {
-            return 150 + baseDmg; // 백 스트레이트
+            name = "백 스트레이트";
+            score = 150;
         } else if (info.isStraight) {
-            return 150 + baseDmg; // 스트레이트
+            name = "스트레이트";
+            score = 150;
         } else if (maxSameNumber == 3) {
-            return 120 + baseDmg; // 트리플
+            name = "트리플";
+            score = 120;
         } else if (pairCount >= 2) {
-            return 100 + baseDmg; // 투 페어
+            name = "투 페어";
+            score = 100;
         } else if (pairCount == 1) {
-            return 60 + baseDmg; // 원 페어
+            name = "원 페어";
+            score = 60;
         } else {
-            return 30 + baseDmg; // 노 페어
+            name = "노 페어";
+            score = 30;
         }
+
+        return new HandResult(name, score, baseDmg);
     }
+
 
 
     // 숫자가 10,11,12,13,1인 경우
@@ -75,6 +92,19 @@ public class DmgEvaluator {
         return false;
     }
 
+
+    //
+    // 숫자와 문양의 등장 횟수, 플러쉬, 스트레이트 여부 정보 저장
+    private static class HandInfo {
+
+        //Map<key, value>형식으로 key는 중복X, value는 중복O이므로 각 숫자별로 몇개가 있는지 셀 수 있음.
+        Map<Integer, Integer> numberCount = new HashMap<>(); //<숫자, 등장 횟수>
+        Map<String, Integer> suitCount = new HashMap<>();
+        List<Integer> sortedNumbers = new ArrayList<>();
+        boolean isFlush = false;
+        boolean isStraight = false;
+    }
+
     private static HandInfo analyzeHand(List<Card> cards) {
         HandInfo info = new HandInfo();
 
@@ -88,6 +118,7 @@ public class DmgEvaluator {
         info.sortedNumbers = new ArrayList<>(numSet); //그걸 넘겨서 정렬했고
         Collections.sort(info.sortedNumbers);
 
+        //플러쉬
         for (int count : info.suitCount.values()) { //val을 넘겨서 5인게 있으면 플러쉬니까
             if (count >= 5) {
                 info.isFlush = true;
@@ -101,14 +132,5 @@ public class DmgEvaluator {
         //이 info를 이용해서 데미지 계산하면 됨.
     }
 
-    private static class HandInfo {
 
-        //Map<key, value>형식으로 key는 중복X, value는 중복O이므로 각 숫자별로 몇개가 있는지 셀 수 있음.
-        Map<Integer, Integer> numberCount = new HashMap<>(); //<숫자, 등장 횟수>
-        Map<String, Integer> suitCount = new HashMap<>();
-        List<Integer> sortedNumbers = new ArrayList<>();
-        boolean isFlush = false;
-        boolean isStraight = false;
-    }
 }
-/

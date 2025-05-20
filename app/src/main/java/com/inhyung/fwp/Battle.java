@@ -115,6 +115,7 @@ public class Battle extends AppCompatActivity {
                     cardSelected[index] = true;
                     cardSlots[index].animate().translationY(-30f).setDuration(150).start();
                 }
+                updateHandResult();
             });
         }
     }
@@ -171,6 +172,7 @@ public class Battle extends AppCompatActivity {
             });
             resetCardSelection();
             updateHandDisplay(); // 정렬 후 화면 갱신
+            updateHandResult();
         });
 
 
@@ -186,6 +188,7 @@ public class Battle extends AppCompatActivity {
             });
             resetCardSelection();
             updateHandDisplay(); // 정렬 후 화면 갱신
+            updateHandResult();
         });
 
         //버리기 버튼
@@ -219,20 +222,31 @@ public class Battle extends AppCompatActivity {
         //공격하기 버튼
         Button useCardBtn = findViewById(R.id.useCard_btn);
         useCardBtn.setOnClickListener(v -> {
-            ArrayList<Card> selectedcards = new ArrayList<>();
-            for (int i = 0; i < cardSlots.length; i++) {
-                if (cardSelected[i]) {
-                    //0. 선택된 카드를 저장하는 배열 하나 추가
-                    selectedcards.add(hand.getCards().get(i));
-                }
-            }
-            if (selectedcards.isEmpty()) {
-                family_damage_textbox.setText("카드를 선택하세요!");
-            }else{
-                //선택된 카드의 데미지 계산을 해서 보여줌, evaluate는 int니까 string으로 넘겨주고.
-                family_damage_textbox.setText(String.valueOf(DmgEvaluator.evaluate(selectedcards)));
-            }
-
+            //적의 hp를 자신의 damg 만큼 깎음.
         });
     }
+
+    private void updateHandResult(){
+        TextView family_damage_textbox = findViewById(R.id.family_damage_textbox);
+
+        ArrayList<Card> selectedcards = new ArrayList<>();
+        for (int i = 0; i < cardSlots.length; i++) {
+            if (cardSelected[i]) {
+                //0. 선택된 카드를 저장하는 배열 하나 추가
+                selectedcards.add(hand.getCards().get(i));
+            }
+        }
+        if (selectedcards.isEmpty()) {
+            family_damage_textbox.setText("카드를 선택하세요!");
+        } else {
+            HandResult result = DmgEvaluator.evaluate(selectedcards);
+            String resultText = String.format("조합: %s\n조합 데미지: %d\n카드 데미지: %d\n총합: %d",
+                    result.combinationName,
+                    result.combinationScore,
+                    result.cardBaseDamage,
+                    result.totalDamage);
+            family_damage_textbox.setText(resultText);
+        }
+    }
+
 }
