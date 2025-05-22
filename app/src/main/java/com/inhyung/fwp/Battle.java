@@ -1,5 +1,6 @@
 package com.inhyung.fwp;
 
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -179,5 +181,20 @@ public class Battle extends AppCompatActivity {
 
 
         });
+    }
+
+    @Override
+    public void onBackPressed(){
+        new AlertDialog.Builder(this)
+                .setTitle("게임 종료")
+                .setMessage("메인 화면으로 돌아가시겠습니까?\n진행 중인 게임은 사라집니다.")
+                .setPositiveButton("예", (dialog, which) -> {
+                    // 메인 액티비티를 새 작업으로 시작하면서 모든 기존 액티비티 제거
+                    Intent intent = new Intent(Battle.this, MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                })
+                .setNegativeButton("아니오", (dialog, which) -> dialog.dismiss())
+                .show();
     }
 }

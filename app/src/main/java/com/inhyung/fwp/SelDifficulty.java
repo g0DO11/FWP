@@ -29,9 +29,9 @@ public class SelDifficulty extends AppCompatActivity {
         FrameLayout normal = findViewById(R.id.normal);
         FrameLayout hard = findViewById(R.id.hard);
 
-        easy.setOnClickListener(v -> {
+        easy.setOnClickListener(v -> { //쉬움 버튼을 눌렀을 때 게임이 시작됨
             GameApplication app = (GameApplication) getApplication();
-            app.initPlayer(GameApplication.GameDifficulty.EASY);
+            app.initPlayer(GameApplication.GameDifficulty.EASY); //플레이어 객체 생성,application에 난이도 기록
             Intent intent = new Intent(SelDifficulty.this, Battle.class);
             startActivity(intent);
         });

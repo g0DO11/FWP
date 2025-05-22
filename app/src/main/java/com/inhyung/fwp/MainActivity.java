@@ -43,7 +43,7 @@ MainActivity extends AppCompatActivity {
         findViewById(R.id.touchTostart).startAnimation(anim);
     }
 
-    public boolean onTouchEvent(MotionEvent event) {
+    public boolean onTouchEvent(MotionEvent event) { //화면을 누르면 난이도 선택 액티비티로 넘어감
         if (event.getAction()==MotionEvent.ACTION_DOWN) {
             Intent intent = new Intent(this, SelDifficulty.class);
             startActivity(intent);
