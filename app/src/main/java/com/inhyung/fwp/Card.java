@@ -17,6 +17,10 @@ public class Card {
         return suitToString(this.suit);
     }
 
+    public int getSuitInt() {
+        return suit;
+    }
+
     @Override
     public String toString() {
         return number + " of " + suitToString(suit);
