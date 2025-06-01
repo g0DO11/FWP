@@ -27,6 +27,8 @@ public class Battle extends AppCompatActivity {
     private Hand hand;
     private DiscardPile discardPile;
 
+    Enemy enemy = new Enemy("기사감자", 100, 2, 20);
+
 
     // 카드 슬롯에 대응하는 뷰들
     private FrameLayout[] cardSlots = new FrameLayout[8];
@@ -161,6 +163,7 @@ public class Battle extends AppCompatActivity {
         hand.drawFromDeck(deck, 8); //처음 패 미리 draw 해둠
         setupCardClickListenersWithAnimation(); //카드 애니메이션 설정
         updateHandDisplay();
+        updateEnemyStatus();
 
         //문양 정렬 버튼
         FrameLayout sortBySuitBtn = findViewById(R.id.sortBySuit_btn);
@@ -197,26 +200,7 @@ public class Battle extends AppCompatActivity {
         //선택됐는지 확인, 인덱스 저장 후 그 인덱스의 카드 discardpile로 보내고 그 자리에 새로운 카드 draw
         Button drawCardBtn = findViewById(R.id.drawCard_btn);
         drawCardBtn.setOnClickListener(v -> {
-            for (int i = 0; i < cardSlots.length; i++) {
-                if (cardSelected[i]) {
-                    // 1. 카드 버리기: discardPile로 보내기만 하고 손패에서 제거 X
-                    Card used = hand.getCards().get(i);
-                    discardPile.discard(used);
-
-                    // 2. 새로운 카드 뽑아서 해당 위치에 교체
-                    if (!deck.isEmpty()) {
-                        Card newCard = deck.draw();
-                        hand.getCards().set(i, newCard);  // remove 대신 set
-                    }
-
-                    // 3. 선택 상태 초기화
-                    cardSelected[i] = false;
-                    cardSlots[i].setTranslationY(0); // 원위치로 이동
-                }
-            }
-            // 4. UI 갱신
-            updateHandDisplay();
-
+            newcard();
         });
 
 
@@ -224,13 +208,74 @@ public class Battle extends AppCompatActivity {
         //공격하기 버튼
         Button useCardBtn = findViewById(R.id.useCard_btn);
         useCardBtn.setOnClickListener(v -> {
-            //적의 hp를 자신의 damg 만큼 깎음.
+            ArrayList<Card> selectedcards = new ArrayList<>();
+            for (int i = 0; i < cardSlots.length; i++) {
+                if (cardSelected[i]) {
+                    selectedcards.add(hand.getCards().get(i));
+                }
+            }
+
+            if (selectedcards.isEmpty()) {
+                family_damage_textbox.setText("카드를 선택하세요!");
+                return;
+            }
+
+            HandResult result = DmgEvaluator.evaluate(selectedcards);
+            int damage = result.totalDamage;
+
+            enemy.takeDamage(damage);
+
+            // 턴 감소
+            enemy.decrementTurn(player);
+
+            newcard();
+
+            // UI 업데이트
+            updateEnemyStatus();
+            updatePlayerStatus();
         });
+    }
+
+    private void newcard(){
+        for (int i = 0; i < cardSlots.length; i++) {
+            if (cardSelected[i]) {
+                // 1. 카드 버리기: discardPile로 보내기만 하고 손패에서 제거 X
+                Card used = hand.getCards().get(i);
+                discardPile.discard(used);
+
+                // 2. 새로운 카드 뽑아서 해당 위치에 교체
+                if (!deck.isEmpty()) {
+                    Card newCard = deck.draw();
+                    hand.getCards().set(i, newCard);  // remove 대신 set
+                }
+
+                // 3. 선택 상태 초기화
+                cardSelected[i] = false;
+                cardSlots[i].setTranslationY(0); // 원위치로 이동
+            }
+        }
+        // 4. UI 갱신
+        updateHandDisplay();
+    }
+
+    private void updatePlayerStatus() {
+        TextView health_point = findViewById(R.id.health_point);
+        TextView wealth_point = findViewById(R.id.wealth_point);
+        health_point.setText(String.valueOf(Player.getHp()));
+        wealth_point.setText(String.valueOf(Player.getMoney()));
+    }
+
+    private void updateEnemyStatus() {
+        TextView enemyhp = findViewById(R.id.enemyhp);
+        TextView enemydmg = findViewById(R.id.enemydmg);
+        TextView enemyturn = findViewById(R.id.turn_textbox);
+        enemyhp.setText(String.valueOf(enemy.getHp()));
+        enemydmg.setText(String.valueOf(enemy.getDmg()));
+        enemyturn.setText(String.valueOf(enemy.getTurn()));
     }
 
     private void updateHandResult(){
         TextView family_damage_textbox = findViewById(R.id.family_damage_textbox);
-
         ArrayList<Card> selectedcards = new ArrayList<>();
         for (int i = 0; i < cardSlots.length; i++) {
             if (cardSelected[i]) {
@@ -250,6 +295,7 @@ public class Battle extends AppCompatActivity {
             family_damage_textbox.setText(resultText);
         }
     }
+
 
     @Override
     public void onBackPressed(){

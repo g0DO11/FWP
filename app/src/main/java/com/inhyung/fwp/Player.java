@@ -1,15 +1,38 @@
 package com.inhyung.fwp;
 
-public class Player extends Character {
-    private int money;
+public class Player {
+    private static int hp;
+    private int maxHp;
+    private static int money;
 
     public Player() {
-        super(100); // HP 설정
+        this.maxHp = 100;
+        this.hp = 100;
         this.money = 0;
     }
 
-    public int getMoney() {
+    public void takeDamage(int dmg) {
+        hp -= dmg;
+        if (hp < 0) hp = 0;
+    }
+
+    public boolean isDead() {
+        return hp <= 0;
+    }
+
+    public static int getHp() {
+        return hp;
+    }
+
+    public int getMaxHp() {
+        return maxHp;
+    }
+
+    public void earnGold(int amount) {
+        money += amount;
+    }
+
+    public static int getMoney() {
         return money;
     }
 }
-
