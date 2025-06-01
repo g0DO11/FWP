@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects; // Objects 클래스 임포트 (equals/hashCode 사용 시)
+import java.util.Objects;
 import java.util.Set;
 
 public class Battle extends AppCompatActivity {
@@ -34,7 +34,8 @@ public class Battle extends AppCompatActivity {
     private DiscardPile discardPile;
 
     Enemy enemy = new Enemy("기사감자", 100, 2, 60);
-    private Player player; // Player 인스턴스 추가
+    private Player player;
+    private SoundManager soundManager;
 
     // 카드 슬롯에 대응하는 뷰들
     private FrameLayout[] cardSlots = new FrameLayout[8];
@@ -104,6 +105,10 @@ public class Battle extends AppCompatActivity {
             int index = i;
             cardSlots[i].setOnClickListener(v -> {
 
+                if (soundManager != null) {
+                    soundManager.playSound(SoundManager.SOUND_CARD_SELECTED);
+                }
+
                 // 현재 선택된 카드 수 세기
                 int selectedCount = 0;
                 for (boolean selected : cardSelected) {
@@ -165,6 +170,7 @@ public class Battle extends AppCompatActivity {
         deck = new Deck();
         hand = new Hand();
         discardPile = new DiscardPile();
+        soundManager = SoundManager.getInstance(this);
 
         initCardViews(); //카드 뷰 초기화
         hand.drawFromDeck(deck, 8); //처음 패 미리 draw 해둠
@@ -175,6 +181,7 @@ public class Battle extends AppCompatActivity {
         //문양 정렬 버튼
         FrameLayout sortBySuitBtn = findViewById(R.id.sortBySuit_btn);
         sortBySuitBtn.setOnClickListener(v -> {
+            if (soundManager != null) soundManager.playSound(SoundManager.SOUND_BTN_CLICK);
             Collections.sort(hand.getCards(), (c1, c2) -> {
                 if (c1.getSuitInt() == c2.getSuitInt()) {
                     return Integer.compare(c1.getNumber(), c2.getNumber()); // 같은 문양이면 숫자순
@@ -191,6 +198,7 @@ public class Battle extends AppCompatActivity {
         //숫자 정렬 버튼
         FrameLayout sortByNumberBtn = findViewById(R.id.sortByNum_btn);
         sortByNumberBtn.setOnClickListener(v -> {
+            if (soundManager != null) soundManager.playSound(SoundManager.SOUND_BTN_CLICK);
             Collections.sort(hand.getCards(), (c1, c2) -> {
                 if (c1.getNumber() == c2.getNumber()) {
                     return Integer.compare(c1.getSuitInt(), c2.getSuitInt()); // 같은 숫자면 문양순
@@ -207,6 +215,7 @@ public class Battle extends AppCompatActivity {
         //선택됐는지 확인, 인덱스 저장 후 그 인덱스의 카드 discardpile로 보내고 그 자리에 새로운 카드 draw
         Button drawCardBtn = findViewById(R.id.drawCard_btn);
         drawCardBtn.setOnClickListener(v -> {
+            if (soundManager != null) soundManager.playSound(SoundManager.SOUND_DRAW_CARD);
             newcard();
         });
 
@@ -215,6 +224,7 @@ public class Battle extends AppCompatActivity {
         //공격하기 버튼
         Button useCardBtn = findViewById(R.id.useCard_btn);
         useCardBtn.setOnClickListener(v -> {
+            if (soundManager != null) soundManager.playSound(SoundManager.SOUND_PLAYER_ATTACK);
             ArrayList<Card> selectedcards = new ArrayList<>();
             for (int i = 0; i < cardSlots.length; i++) {
                 if (cardSelected[i]) {

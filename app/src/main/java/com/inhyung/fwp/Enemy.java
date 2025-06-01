@@ -9,6 +9,7 @@ public class Enemy {
     private int maxTurn;
     private int dmg;
     private String name;
+    private SoundManager soundManager;
 
     public Enemy(String name, int hp, int maxTurn, int dmg) {
         this.name = name;
@@ -34,6 +35,7 @@ public class Enemy {
 
     public void attackPlayer(Player player) {
         player.takeDamage(dmg);
+        if (soundManager != null) soundManager.playSound(SoundManager.SOUND_ENEMY_ATTACK);
         Log.d("Enemy", name + "이 플레이어를 공격했습니다! DMG: " + dmg);
     }
 
