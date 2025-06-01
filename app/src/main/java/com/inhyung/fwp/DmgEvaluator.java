@@ -58,7 +58,7 @@ public class DmgEvaluator {
             score = 60;
         } else {
             name = "노 페어";
-            score = 30;
+            score = 10;
         }
 
         return new HandResult(name, score, baseDmg);

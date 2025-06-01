@@ -38,7 +38,7 @@ public class Card {
         }
     }
 
-
+    //그냥하면 이게 다른걸로 인식을 해버리니까 동등성있다고 해줘야됨.
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

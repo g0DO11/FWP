@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects; // Objects 클래스 임포트 (equals/hashCode 사용 시)
 import java.util.Set;
 
 public class Battle extends AppCompatActivity {
@@ -32,8 +33,8 @@ public class Battle extends AppCompatActivity {
     private Hand hand;
     private DiscardPile discardPile;
 
-    Enemy enemy = new Enemy("기사감자", 100, 2, 20);
-
+    Enemy enemy = new Enemy("기사감자", 100, 2, 60);
+    private Player player; // Player 인스턴스 추가
 
     // 카드 슬롯에 대응하는 뷰들
     private FrameLayout[] cardSlots = new FrameLayout[8];
@@ -139,6 +140,7 @@ public class Battle extends AppCompatActivity {
     }
 
 
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
@@ -151,13 +153,13 @@ public class Battle extends AppCompatActivity {
         });
 
         GameApplication app = (GameApplication) getApplication();
-        Player player = app.getPlayer();
+        player = app.getPlayer(); // Player 인스턴스 초기화
 
         TextView health_point = findViewById(R.id.health_point);
         TextView wealth_point = findViewById(R.id.wealth_point);
 
-        health_point.setText(String.valueOf(player.getHp()));
-        wealth_point.setText(String.valueOf(player.getMoney()));
+        health_point.setText(String.valueOf(Player.getHp())); // player 인스턴스 사용
+        wealth_point.setText(String.valueOf(Player.getMoney())); // player 인스턴스 사용
 
         // 게임 초기화
         deck = new Deck();
@@ -230,14 +232,18 @@ public class Battle extends AppCompatActivity {
 
             enemy.takeDamage(damage);
 
-            // 턴 감소
-            enemy.decrementTurn(player);
+            // 턴 감소 및 적 공격
+            enemy.decrementTurn(player); // 턴 감소 및 플레이어 공격 로직 포함
 
+            // 새로운 카드 뽑기 및 UI 갱신 (선택된 카드만)
             newcard();
 
             // UI 업데이트
             updateEnemyStatus();
             updatePlayerStatus();
+
+            // 게임 종료 조건 확인 (공격 후)
+            checkGameEndCondition();
         });
 
         ImageButton usedBtn = findViewById(R.id.usedcards_imgbtn);
@@ -256,6 +262,10 @@ public class Battle extends AppCompatActivity {
                 if (!deck.isEmpty()) {
                     Card newCard = deck.draw();
                     hand.getCards().set(i, newCard);  // remove 대신 set
+                } else {
+                    // 덱이 비었을 경우 처리 (예: 버림 패 섞기, 새로운 덱 생성 등)
+                    // 현재는 덱이 비어있으면 카드 교체를 하지 않음
+                    Toast.makeText(this, "덱에 더 이상 카드가 없습니다!", Toast.LENGTH_SHORT).show();
                 }
 
                 // 3. 선택 상태 초기화
@@ -272,6 +282,9 @@ public class Battle extends AppCompatActivity {
         TextView wealth_point = findViewById(R.id.wealth_point);
         health_point.setText(String.valueOf(Player.getHp()));
         wealth_point.setText(String.valueOf(Player.getMoney()));
+
+        // 플레이어 HP 체크
+        checkGameEndCondition();
     }
 
     private void updateEnemyStatus() {
@@ -281,7 +294,27 @@ public class Battle extends AppCompatActivity {
         enemyhp.setText(String.valueOf(enemy.getHp()));
         enemydmg.setText(String.valueOf(enemy.getDmg()));
         enemyturn.setText(String.valueOf(enemy.getTurn()));
+
+        // 적 HP 체크
+        checkGameEndCondition();
     }
+
+    private void checkGameEndCondition() {
+        String resultMessage = null;
+        if (enemy.getHp() <= 0) {
+            resultMessage = "승리!";
+        } else if (Player.getHp() <= 0) {
+            resultMessage = "패배!";
+        }
+
+        if (resultMessage != null) {
+            Intent intent = new Intent(Battle.this, GameEnd.class);
+            intent.putExtra("GAME_RESULT", resultMessage);
+            startActivity(intent);
+            finish(); // Battle 액티비티 종료
+        }
+    }
+
 
     private void updateHandResult(){
         TextView family_damage_textbox = findViewById(R.id.family_damage_textbox);
@@ -308,7 +341,7 @@ public class Battle extends AppCompatActivity {
 
     @Override
     public void onBackPressed(){
-        super.onBackPressed();
+        super.onBackPressed(); // 기본 뒤로 가기 동작 호출
         new AlertDialog.Builder(this)
                 .setTitle("게임 종료")
                 .setMessage("메인 화면으로 돌아가시겠습니까?\n진행 중인 게임은 사라집니다.")
