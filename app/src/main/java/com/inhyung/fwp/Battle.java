@@ -1,11 +1,14 @@
 package com.inhyung.fwp;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.GridLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,7 +22,9 @@ import androidx.core.view.WindowInsetsCompat;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class Battle extends AppCompatActivity {
 
@@ -234,6 +239,10 @@ public class Battle extends AppCompatActivity {
             updateEnemyStatus();
             updatePlayerStatus();
         });
+
+        ImageButton usedBtn = findViewById(R.id.usedcards_imgbtn);
+        usedBtn.setOnClickListener(v -> showUsedCardsDialog());
+
     }
 
     private void newcard(){
@@ -311,5 +320,49 @@ public class Battle extends AppCompatActivity {
                 })
                 .setNegativeButton("아니오", (dialog, which) -> dialog.dismiss())
                 .show();
+    }
+
+    private void showUsedCardsDialog() {
+        Dialog dialog = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+        dialog.setContentView(R.layout.dialog_used_cards);
+        dialog.show();
+
+        GridLayout gridLayout = dialog.findViewById(R.id.grid_cards);
+        Button closeBtn = dialog.findViewById(R.id.close_button);
+        closeBtn.setOnClickListener(v -> dialog.dismiss());
+
+        // 카드 전체 생성 (덱 초기화 로직과 동일)
+        List<Card> allCards = new ArrayList<>();
+        for (int suit = 0; suit < 4; suit++) {
+            for (int number = 1; number <= 13; number++) {
+                allCards.add(new Card(number, suit));
+            }
+        }
+
+        Set<Card> discarded = new HashSet<>(discardPile.getCards());
+
+        for (Card card : allCards) {
+            View cardView = getLayoutInflater().inflate(R.layout.item_card, null);
+
+            TextView cardRank = cardView.findViewById(R.id.item_card_rank);
+            ImageView cardMainImg = cardView.findViewById(R.id.item_card_main_img);
+            ImageView cardSuitImg = cardView.findViewById(R.id.item_card_suit_img);
+            ImageView xOverlay = cardView.findViewById(R.id.x_overlay);
+
+            // 카드 정보 설정
+            cardRank.setText(String.valueOf(card.getNumber()));
+            cardSuitImg.setImageResource(getSuitDrawable(card.getSuit()));
+            // 메인 이미지는 항상 eg_potato_72_72로 설정 (기존 activity_battle.xml과 동일)
+            cardMainImg.setImageResource(R.drawable.eg_potato_72_72);
+
+
+            if (discarded.contains(card)) {
+                xOverlay.setVisibility(View.VISIBLE);
+            } else {
+                xOverlay.setVisibility(View.GONE);
+            }
+
+            gridLayout.addView(cardView);
+        }
     }
 }
