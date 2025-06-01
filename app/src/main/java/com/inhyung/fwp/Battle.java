@@ -253,6 +253,7 @@ public class Battle extends AppCompatActivity {
 
     @Override
     public void onBackPressed(){
+        super.onBackPressed();
         new AlertDialog.Builder(this)
                 .setTitle("게임 종료")
                 .setMessage("메인 화면으로 돌아가시겠습니까?\n진행 중인 게임은 사라집니다.")
