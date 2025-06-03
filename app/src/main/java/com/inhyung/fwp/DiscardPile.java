@@ -21,4 +21,9 @@ public class DiscardPile {
     public int size() {
         return pile.size();
     }
+
+    public ArrayList<Card> getCards() {
+        return new ArrayList<>(pile); // 복사본 반환
+    }
+
 }

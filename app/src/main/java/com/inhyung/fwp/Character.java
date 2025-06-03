@@ -17,9 +17,5 @@ public class Character {
     public boolean isDead() {
         return hp <= 0;
     }
-
-    public int getHp() {
-        return hp;
-    }
 }
 

@@ -1,11 +1,14 @@
 package com.inhyung.fwp;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.GridLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,7 +22,10 @@ import androidx.core.view.WindowInsetsCompat;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 public class Battle extends AppCompatActivity {
 
@@ -27,7 +33,9 @@ public class Battle extends AppCompatActivity {
     private Hand hand;
     private DiscardPile discardPile;
 
-    GameApplication app = (GameApplication) getApplication();
+    Enemy enemy = new Enemy("기사감자", 100, 2, 60);
+    private Player player;
+    private SoundManager soundManager;
 
     // 카드 슬롯에 대응하는 뷰들
     private FrameLayout[] cardSlots = new FrameLayout[8];
@@ -97,6 +105,10 @@ public class Battle extends AppCompatActivity {
             int index = i;
             cardSlots[i].setOnClickListener(v -> {
 
+                if (soundManager != null) {
+                    soundManager.playSound(SoundManager.SOUND_CARD_SELECTED);
+                }
+
                 // 현재 선택된 카드 수 세기
                 int selectedCount = 0;
                 for (boolean selected : cardSelected) {
@@ -133,6 +145,7 @@ public class Battle extends AppCompatActivity {
     }
 
 
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
@@ -145,27 +158,30 @@ public class Battle extends AppCompatActivity {
         });
 
         GameApplication app = (GameApplication) getApplication();
-        Player player = app.getPlayer();
+        player = app.getPlayer(); // Player 인스턴스 초기화
 
         TextView health_point = findViewById(R.id.health_point);
         TextView wealth_point = findViewById(R.id.wealth_point);
 
-        health_point.setText(String.valueOf(player.getHp()));
-        wealth_point.setText(String.valueOf(player.getMoney()));
+        health_point.setText(String.valueOf(Player.getHp())); // player 인스턴스 사용
+        wealth_point.setText(String.valueOf(Player.getMoney())); // player 인스턴스 사용
 
         // 게임 초기화
         deck = new Deck();
         hand = new Hand();
         discardPile = new DiscardPile();
+        soundManager = SoundManager.getInstance(this);
 
         initCardViews(); //카드 뷰 초기화
         hand.drawFromDeck(deck, 8); //처음 패 미리 draw 해둠
         setupCardClickListenersWithAnimation(); //카드 애니메이션 설정
         updateHandDisplay();
+        updateEnemyStatus();
 
         //문양 정렬 버튼
         FrameLayout sortBySuitBtn = findViewById(R.id.sortBySuit_btn);
         sortBySuitBtn.setOnClickListener(v -> {
+            if (soundManager != null) soundManager.playSound(SoundManager.SOUND_BTN_CLICK);
             Collections.sort(hand.getCards(), (c1, c2) -> {
                 if (c1.getSuitInt() == c2.getSuitInt()) {
                     return Integer.compare(c1.getNumber(), c2.getNumber()); // 같은 문양이면 숫자순
@@ -182,6 +198,7 @@ public class Battle extends AppCompatActivity {
         //숫자 정렬 버튼
         FrameLayout sortByNumberBtn = findViewById(R.id.sortByNum_btn);
         sortByNumberBtn.setOnClickListener(v -> {
+            if (soundManager != null) soundManager.playSound(SoundManager.SOUND_BTN_CLICK);
             Collections.sort(hand.getCards(), (c1, c2) -> {
                 if (c1.getNumber() == c2.getNumber()) {
                     return Integer.compare(c1.getSuitInt(), c2.getSuitInt()); // 같은 숫자면 문양순
@@ -198,26 +215,8 @@ public class Battle extends AppCompatActivity {
         //선택됐는지 확인, 인덱스 저장 후 그 인덱스의 카드 discardpile로 보내고 그 자리에 새로운 카드 draw
         Button drawCardBtn = findViewById(R.id.drawCard_btn);
         drawCardBtn.setOnClickListener(v -> {
-            for (int i = 0; i < cardSlots.length; i++) {
-                if (cardSelected[i]) {
-                    // 1. 카드 버리기: discardPile로 보내기만 하고 손패에서 제거 X
-                    Card used = hand.getCards().get(i);
-                    discardPile.discard(used);
-
-                    // 2. 새로운 카드 뽑아서 해당 위치에 교체
-                    if (!deck.isEmpty()) {
-                        Card newCard = deck.draw();
-                        hand.getCards().set(i, newCard);  // remove 대신 set
-                    }
-
-                    // 3. 선택 상태 초기화
-                    cardSelected[i] = false;
-                    cardSlots[i].setTranslationY(0); // 원위치로 이동
-                }
-            }
-            // 4. UI 갱신
-            updateHandDisplay();
-
+            if (soundManager != null) soundManager.playSound(SoundManager.SOUND_DRAW_CARD);
+            newcard();
         });
 
 
@@ -225,9 +224,107 @@ public class Battle extends AppCompatActivity {
         //공격하기 버튼
         Button useCardBtn = findViewById(R.id.useCard_btn);
         useCardBtn.setOnClickListener(v -> {
-            //적의 hp를 자신의 damg 만큼 깎음.
+            if (soundManager != null) soundManager.playSound(SoundManager.SOUND_PLAYER_ATTACK);
+            ArrayList<Card> selectedcards = new ArrayList<>();
+            for (int i = 0; i < cardSlots.length; i++) {
+                if (cardSelected[i]) {
+                    selectedcards.add(hand.getCards().get(i));
+                }
+            }
+
+            if (selectedcards.isEmpty()) {
+                family_damage_textbox.setText("카드를 선택하세요!");
+                return;
+            }
+
+            HandResult result = DmgEvaluator.evaluate(selectedcards);
+            int damage = result.totalDamage;
+
+            enemy.takeDamage(damage);
+
+            // 턴 감소 및 적 공격
+            enemy.decrementTurn(player); // 턴 감소 및 플레이어 공격 로직 포함
+
+            // 새로운 카드 뽑기 및 UI 갱신 (선택된 카드만)
+            newcard();
+
+            // UI 업데이트
+            updateEnemyStatus();
+            updatePlayerStatus();
+
+            // 게임 종료 조건 확인 (공격 후)
+            checkGameEndCondition();
         });
+
+        ImageButton usedBtn = findViewById(R.id.usedcards_imgbtn);
+        usedBtn.setOnClickListener(v -> showUsedCardsDialog());
+
     }
+
+    private void newcard(){
+        for (int i = 0; i < cardSlots.length; i++) {
+            if (cardSelected[i]) {
+                // 1. 카드 버리기: discardPile로 보내기만 하고 손패에서 제거 X
+                Card used = hand.getCards().get(i);
+                discardPile.discard(used);
+
+                // 2. 새로운 카드 뽑아서 해당 위치에 교체
+                if (!deck.isEmpty()) {
+                    Card newCard = deck.draw();
+                    hand.getCards().set(i, newCard);  // remove 대신 set
+                } else {
+                    // 덱이 비었을 경우 처리 (예: 버림 패 섞기, 새로운 덱 생성 등)
+                    // 현재는 덱이 비어있으면 카드 교체를 하지 않음
+                    Toast.makeText(this, "덱에 더 이상 카드가 없습니다!", Toast.LENGTH_SHORT).show();
+                }
+
+                // 3. 선택 상태 초기화
+                cardSelected[i] = false;
+                cardSlots[i].setTranslationY(0); // 원위치로 이동
+            }
+        }
+        // 4. UI 갱신
+        updateHandDisplay();
+    }
+
+    private void updatePlayerStatus() {
+        TextView health_point = findViewById(R.id.health_point);
+        TextView wealth_point = findViewById(R.id.wealth_point);
+        health_point.setText(String.valueOf(Player.getHp()));
+        wealth_point.setText(String.valueOf(Player.getMoney()));
+
+        // 플레이어 HP 체크
+        checkGameEndCondition();
+    }
+
+    private void updateEnemyStatus() {
+        TextView enemyhp = findViewById(R.id.enemyhp);
+        TextView enemydmg = findViewById(R.id.enemydmg);
+        TextView enemyturn = findViewById(R.id.turn_textbox);
+        enemyhp.setText(String.valueOf(enemy.getHp()));
+        enemydmg.setText(String.valueOf(enemy.getDmg()));
+        enemyturn.setText(String.valueOf(enemy.getTurn()));
+
+        // 적 HP 체크
+        checkGameEndCondition();
+    }
+
+    private void checkGameEndCondition() {
+        String resultMessage = null;
+        if (enemy.getHp() <= 0) {
+            resultMessage = "승리!";
+        } else if (Player.getHp() <= 0) {
+            resultMessage = "패배!";
+        }
+
+        if (resultMessage != null) {
+            Intent intent = new Intent(Battle.this, GameEnd.class);
+            intent.putExtra("GAME_RESULT", resultMessage);
+            startActivity(intent);
+            finish(); // Battle 액티비티 종료
+        }
+    }
+
 
     private void updateHandResult(){
         TextView family_damage_textbox = findViewById(R.id.family_damage_textbox);
@@ -265,5 +362,49 @@ public class Battle extends AppCompatActivity {
                 })
                 .setNegativeButton("아니오", (dialog, which) -> dialog.dismiss())
                 .show();
+    }
+
+    private void showUsedCardsDialog() {
+        Dialog dialog = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+        dialog.setContentView(R.layout.dialog_used_cards);
+        dialog.show();
+
+        GridLayout gridLayout = dialog.findViewById(R.id.grid_cards);
+        Button closeBtn = dialog.findViewById(R.id.close_button);
+        closeBtn.setOnClickListener(v -> dialog.dismiss());
+
+        // 카드 전체 생성 (덱 초기화 로직과 동일)
+        List<Card> allCards = new ArrayList<>();
+        for (int suit = 0; suit < 4; suit++) {
+            for (int number = 1; number <= 13; number++) {
+                allCards.add(new Card(number, suit));
+            }
+        }
+
+        Set<Card> discarded = new HashSet<>(discardPile.getCards());
+
+        for (Card card : allCards) {
+            View cardView = getLayoutInflater().inflate(R.layout.item_card, null);
+
+            TextView cardRank = cardView.findViewById(R.id.item_card_rank);
+            ImageView cardMainImg = cardView.findViewById(R.id.item_card_main_img);
+            ImageView cardSuitImg = cardView.findViewById(R.id.item_card_suit_img);
+            ImageView xOverlay = cardView.findViewById(R.id.x_overlay);
+
+            // 카드 정보 설정
+            cardRank.setText(String.valueOf(card.getNumber()));
+            cardSuitImg.setImageResource(getSuitDrawable(card.getSuit()));
+            // 메인 이미지는 항상 eg_potato_72_72로 설정 (기존 activity_battle.xml과 동일)
+            cardMainImg.setImageResource(R.drawable.eg_potato_72_72);
+
+
+            if (discarded.contains(card)) {
+                xOverlay.setVisibility(View.VISIBLE);
+            } else {
+                xOverlay.setVisibility(View.GONE);
+            }
+
+            gridLayout.addView(cardView);
+        }
     }
 }

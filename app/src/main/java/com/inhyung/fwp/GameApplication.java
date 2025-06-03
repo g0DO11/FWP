@@ -6,6 +6,15 @@ public class GameApplication extends Application {
     private Player player;
     private GameDifficulty difficulty;
 
+    public static GameApplication getInstance() {
+        return (GameApplication) getApplication();
+    }
+
+    private static Object getApplication() {
+        return null;
+    }
+
+
     @Override
     public void onCreate() {
         super.onCreate();

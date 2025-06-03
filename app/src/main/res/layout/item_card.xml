@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="2dp">
+
+    <ImageView
+        android:layout_width="60dp"
+        android:layout_height="85dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/bg_card" />
+
+    <TextView
+        android:id="@+id/item_card_rank"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:text="10"
+        android:textAlignment="center"
+        android:textSize="12sp"
+        android:textColor="@android:color/black"/>
+
+    <ImageView
+        android:id="@+id/item_card_main_img"
+        android:layout_width="46dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:src="@drawable/eg_potato_72_72" />
+
+    <ImageView
+        android:id="@+id/item_card_suit_img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="4dp"
+        android:src="@drawable/suit_leaf" />
+
+    <ImageView
+        android:id="@+id/x_overlay"
+        android:layout_width="64dp"
+        android:layout_height="88dp"
+        android:src="@drawable/x_overlay"
+        android:visibility="gone"
+        android:scaleType="centerInside"
+        android:background="#80000000" />
+</FrameLayout>
