@@ -25,7 +25,7 @@ public class GameEnd extends AppCompatActivity {
         });
 
         TextView battleResultTextView = findViewById(R.id.battleresult);
-        Button goMainButton = findViewById(R.id.gomain_btn);
+        Button NextButton = findViewById(R.id.next_btn);
 
         // Intent로부터 결과 메시지 받기
         Intent intent = getIntent();
@@ -34,8 +34,8 @@ public class GameEnd extends AppCompatActivity {
             battleResultTextView.setText(result);
         }
 
-        goMainButton.setOnClickListener(v -> {
-            Intent mainIntent = new Intent(GameEnd.this, MainActivity.class);
+        NextButton.setOnClickListener(v -> {
+            Intent mainIntent = new Intent(GameEnd.this, StageMapActivity.class);
             mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(mainIntent);
             finish();

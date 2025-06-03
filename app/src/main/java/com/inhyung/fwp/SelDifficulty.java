@@ -32,7 +32,8 @@ public class SelDifficulty extends AppCompatActivity {
         easy.setOnClickListener(v -> { //쉬움 버튼을 눌렀을 때 게임이 시작됨
             GameApplication app = (GameApplication) getApplication();
             app.initPlayer(GameApplication.GameDifficulty.EASY); //플레이어 객체 새로 생성(리셋할 필요 X),application에 난이도 기록
-            Intent intent = new Intent(SelDifficulty.this, Battle.class);
+            app.initStageMap(GameApplication.GameDifficulty.EASY);
+            Intent intent = new Intent(SelDifficulty.this, StageMapActivity.class);
             startActivity(intent);
         });
     }

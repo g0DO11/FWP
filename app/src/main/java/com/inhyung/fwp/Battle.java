@@ -32,6 +32,7 @@ public class Battle extends AppCompatActivity {
     private Deck deck;
     private Hand hand;
     private DiscardPile discardPile;
+    private boolean gameFinished=false;
 
     Enemy enemy = new Enemy("기사감자", 100, 2, 60);
     private Player player;
@@ -310,21 +311,40 @@ public class Battle extends AppCompatActivity {
     }
 
     private void checkGameEndCondition() {
-        String resultMessage = null;
+        if(gameFinished) return;
+        String resultMessage;
+
         if (enemy.getHp() <= 0) {
             resultMessage = "승리!";
         } else if (Player.getHp() <= 0) {
             resultMessage = "패배!";
+        } else {
+            resultMessage = null;
         }
 
-        if (resultMessage != null) {
-            Intent intent = new Intent(Battle.this, GameEnd.class);
-            intent.putExtra("GAME_RESULT", resultMessage);
-            startActivity(intent);
-            finish(); // Battle 액티비티 종료
+        if (resultMessage != null && !gameFinished) {
+            gameFinished=true;
+            new AlertDialog.Builder(this)
+                    .setTitle("게임 결과")
+                    .setMessage(resultMessage)
+                    .setPositiveButton("확인", (dialog, which) -> {
+                        if (resultMessage.compareTo("승리!")==0) {
+                            // 승리 시: StageMapActivity로 이동
+                            Intent intent = new Intent(Battle.this, StageMapActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                        } else if (resultMessage.compareTo("패배!")==0) {
+                            // 패배 시: MainActivity로 이동
+                            Intent intent = new Intent(Battle.this, MainActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                        }
+                        finish(); // Battle 액티비티 종료
+                    })
+                    .setCancelable(false)  // 다이얼로그 외부 터치로 닫히지 않도록 설정
+                    .show();
         }
     }
-
 
     private void updateHandResult(){
         TextView family_damage_textbox = findViewById(R.id.family_damage_textbox);
@@ -347,21 +367,6 @@ public class Battle extends AppCompatActivity {
                     result.totalDamage);
             family_damage_textbox.setText(resultText);
         }
-    }
-
-    @Override
-    public void onBackPressed(){
-        new AlertDialog.Builder(this)
-                .setTitle("게임 종료")
-                .setMessage("메인 화면으로 돌아가시겠습니까?\n진행 중인 게임은 사라집니다.")
-                .setPositiveButton("예", (dialog, which) -> {
-                    // 메인 액티비티를 새 작업으로 시작하면서 모든 기존 액티비티 제거
-                    Intent intent = new Intent(Battle.this, MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                })
-                .setNegativeButton("아니오", (dialog, which) -> dialog.dismiss())
-                .show();
     }
 
     private void showUsedCardsDialog() {
@@ -406,5 +411,20 @@ public class Battle extends AppCompatActivity {
 
             gridLayout.addView(cardView);
         }
+    }
+
+    @Override
+    public void onBackPressed(){
+        new AlertDialog.Builder(this)
+                .setTitle("게임 종료")
+                .setMessage("메인 화면으로 돌아가시겠습니까?\n진행 중인 게임은 사라집니다.")
+                .setPositiveButton("예", (dialog, which) -> {
+                    // 메인 액티비티를 새 작업으로 시작하면서 모든 기존 액티비티 제거
+                    Intent intent = new Intent(Battle.this, MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                })
+                .setNegativeButton("아니오", (dialog, which) -> dialog.dismiss())
+                .show();
     }
 }
