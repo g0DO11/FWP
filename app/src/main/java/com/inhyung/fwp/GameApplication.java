@@ -1,6 +1,7 @@
 package com.inhyung.fwp;
 
 import android.app.Application;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,6 +57,7 @@ public class GameApplication extends Application {
         // 리스트화해서 StageMap 생성
         List<StageNode> nodeList = new ArrayList<>(nodeMap.values());
         this.stageMap = new StageMap(nodeList, 1); // 시작 노드는 항상 ID 1로 설정
+        Log.d("stagemap", stageMap.getCurrentNode().toString());
     }
 
 

@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -329,7 +330,8 @@ public class Battle extends AppCompatActivity {
                     .setMessage(resultMessage)
                     .setPositiveButton("확인", (dialog, which) -> {
                         if (resultMessage.compareTo("승리!")==0) {
-                            // 승리 시: StageMapActivity로 이동
+                            // 승리 시: cleared true로 바꾸고 StageMapActivity로 이동
+                            ((GameApplication) getApplication()).getStageMap().getCurrentNode().setCleared(true);
                             Intent intent = new Intent(Battle.this, StageMapActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(intent);

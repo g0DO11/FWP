@@ -1,7 +1,6 @@
 package com.inhyung.fwp;
 
-import java.util.List;
-
+import java.util.ArrayList;
 import java.util.List;
 
 public class StageMap {
@@ -18,6 +17,10 @@ public class StageMap {
             if (node.getId() == currentNodeId)
                 return node;
         return null;
+    }
+
+    public int getCurrentNodeId(){
+        return currentNodeId;
     }
 
     public List<StageNode> getNodes() { return nodes; }

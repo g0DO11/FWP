@@ -42,7 +42,7 @@ public class StageMapActivity extends AppCompatActivity {
                 btn.setBackgroundColor(Color.RED); //보스
             } else if (node.isAccessibleFrom(current)) {
                 btn.setBackgroundColor(Color.YELLOW); // 이동 가능한 노드
-            } else if (node.isCleared()||node.getType() == StageNode.Type.START){
+            } else if (node.isCleared() || node.getType() == StageNode.Type.START){
                 btn.setBackgroundColor(Color.DKGRAY); // 클리어된 노드
             } else if (!node.isCleared() && node.getType() != StageNode.Type.BOSS){
                 btn.setBackgroundColor(Color.GRAY); //보스가 아니면서 클리어되지 않은(갈 수 없는) 노드
