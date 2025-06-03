@@ -27,6 +27,7 @@ public class Battle extends AppCompatActivity {
     private Hand hand;
     private DiscardPile discardPile;
 
+    GameApplication app = (GameApplication) getApplication();
 
     // 카드 슬롯에 대응하는 뷰들
     private FrameLayout[] cardSlots = new FrameLayout[8];
@@ -115,7 +116,7 @@ public class Battle extends AppCompatActivity {
                         return;
                     }
                     cardSelected[index] = true;
-                    cardSlots[index].animate().translationY(-30f).setDuration(150).start();
+                    cardSlots[index].animate().translationY(-50f).setDuration(150).start();
                 }
                 updateHandResult();
             });

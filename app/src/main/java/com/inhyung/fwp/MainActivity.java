@@ -27,6 +27,9 @@ public class
 
 
 MainActivity extends AppCompatActivity {
+
+    private boolean allowTouch = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,14 +44,14 @@ MainActivity extends AppCompatActivity {
 
         Animation anim = AnimationUtils.loadAnimation(this, R.anim.blink);
         findViewById(R.id.touchTostart).startAnimation(anim);
-    }
 
-    public boolean onTouchEvent(MotionEvent event) { //화면을 누르면 난이도 선택 액티비티로 넘어감
-        if (event.getAction()==MotionEvent.ACTION_DOWN) {
+        //일정시간 후 터치 허용
+        new android.os.Handler().postDelayed(() -> allowTouch = true, 500);
+
+        findViewById(R.id.main).setOnClickListener(e -> {
+            if (!allowTouch) return;
             Intent intent = new Intent(this, SelDifficulty.class);
             startActivity(intent);
-            return true;
-        }
-        return false;
+        });
     }
 }

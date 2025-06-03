@@ -11,7 +11,7 @@ public class GameApplication extends Application {
         super.onCreate();
     }
 
-    public void initPlayer(GameDifficulty difficulty) {
+    public void initPlayer(GameDifficulty difficulty) { //플레이어 생성
         this.difficulty = difficulty;
         this.player = new Player();
     }
@@ -22,10 +22,6 @@ public class GameApplication extends Application {
 
     public GameDifficulty getDifficulty() {
         return difficulty;
-    }
-
-    public void resetPlayer() {
-        this.player = null;
     }
 
     public enum GameDifficulty {
