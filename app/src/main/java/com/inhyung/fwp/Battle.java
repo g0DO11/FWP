@@ -35,7 +35,7 @@ public class Battle extends AppCompatActivity {
     private DiscardPile discardPile;
     private boolean gameFinished=false;
 
-    Enemy enemy = new Enemy("기사감자", 100, 2, 60);
+    Enemy enemy = new Enemy("기사감자", 100, 2, 60, 30);
     private Player player;
     private SoundManager soundManager;
 
@@ -317,6 +317,7 @@ public class Battle extends AppCompatActivity {
 
         if (enemy.getHp() <= 0) {
             resultMessage = "승리!";
+            player.earnMoney(enemy.getReward());
         } else if (Player.getHp() <= 0) {
             resultMessage = "패배!";
         } else {

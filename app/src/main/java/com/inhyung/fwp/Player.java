@@ -28,9 +28,10 @@ public class Player {
         return maxHp;
     }
 
-    public void earnGold(int amount) {
-        money += amount;
+    public void earnMoney(int reward) {
+        money += reward;
     }
+    public void spendMoney(int cost) { money -= cost; }
 
     public static int getMoney() {
         return money;

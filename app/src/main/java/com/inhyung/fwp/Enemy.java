@@ -9,15 +9,17 @@ public class Enemy {
     private int maxTurn;
     private int dmg;
     private String name;
+    private int reward;
     private SoundManager soundManager;
 
-    public Enemy(String name, int hp, int maxTurn, int dmg) {
+    public Enemy(String name, int hp, int maxTurn, int dmg, int reward) {
         this.name = name;
         this.hp = hp;
         this.maxHp = hp;
         this.turn = maxTurn;
         this.maxTurn = maxTurn;
         this.dmg = dmg;
+        this.reward = reward;
     }
 
     public void takeDamage(int dmg) {
@@ -61,6 +63,9 @@ public class Enemy {
 
     public String getName() {
         return name;
+    }
+    public int getReward() {
+        return reward;
     }
 
     public void setTurn(int turn) {
