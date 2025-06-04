@@ -10,9 +10,12 @@ public class Enemy {
     private int dmg;
     private String name;
     private int reward;
+    private int imgRes;
+    private int stage;
+    private StageNode.Type type;
     private SoundManager soundManager;
 
-    public Enemy(String name, int hp, int maxTurn, int dmg, int reward) {
+    public Enemy(String name, int hp, int maxTurn, int dmg, int reward, int img, int stage, StageNode.Type type) {
         this.name = name;
         this.hp = hp;
         this.maxHp = hp;
@@ -20,6 +23,23 @@ public class Enemy {
         this.maxTurn = maxTurn;
         this.dmg = dmg;
         this.reward = reward;
+        this.imgRes = img;
+        this.stage = stage;
+        this.type = type;
+    }
+
+    //복사 생성자
+    public Enemy(Enemy other) {
+        this.name = other.getName();
+        this.hp = other.getHp();
+        this.maxHp = other.getHp();
+        this.turn = other.getTurn();
+        this.maxTurn = other.getTurn();
+        this.dmg = other.getDmg();
+        this.reward = other.getReward();
+        this.imgRes = other.getImgRes();
+        this.stage = other.getStage();
+        this.type = other.getType();
     }
 
     public void takeDamage(int dmg) {
@@ -64,9 +84,16 @@ public class Enemy {
     public String getName() {
         return name;
     }
+
     public int getReward() {
         return reward;
     }
+
+    public int getImgRes() { return imgRes; }
+
+    public int getStage() { return stage;}
+
+    public StageNode.Type getType() { return type; }
 
     public void setTurn(int turn) {
         this.turn = turn;

@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -25,17 +24,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
-public class Battle extends AppCompatActivity {
+public class BattleActivity extends AppCompatActivity {
+    GameApplication app;
 
     private Deck deck;
     private Hand hand;
     private DiscardPile discardPile;
     private boolean gameFinished=false;
+    private boolean isBoss;
 
-    Enemy enemy = new Enemy("기사감자", 100, 2, 60, 30);
+    private Enemy enemy;
+
     private Player player;
     private SoundManager soundManager;
 
@@ -159,7 +160,7 @@ public class Battle extends AppCompatActivity {
             return insets;
         });
 
-        GameApplication app = (GameApplication) getApplication();
+        app = (GameApplication) getApplication();
         player = app.getPlayer(); // Player 인스턴스 초기화
 
         TextView health_point = findViewById(R.id.health_point);
@@ -167,6 +168,9 @@ public class Battle extends AppCompatActivity {
 
         health_point.setText(String.valueOf(Player.getHp())); // player 인스턴스 사용
         wealth_point.setText(String.valueOf(Player.getMoney())); // player 인스턴스 사용
+
+        //적 생성
+        enemy = Enemy_Database.getRandomEnemy(app.getStageMap().getCurrentNode().getStage(), app.getStageMap().getCurrentNode().getType());
 
         // 게임 초기화
         deck = new Deck();
@@ -244,6 +248,10 @@ public class Battle extends AppCompatActivity {
 
             enemy.takeDamage(damage);
 
+            //플레이어가 공격 후 적 체력 확인
+            checkGameEndCondition();
+            if (gameFinished) return;
+
             // 턴 감소 및 적 공격
             enemy.decrementTurn(player); // 턴 감소 및 플레이어 공격 로직 포함
 
@@ -303,9 +311,12 @@ public class Battle extends AppCompatActivity {
         TextView enemyhp = findViewById(R.id.enemyhp);
         TextView enemydmg = findViewById(R.id.enemydmg);
         TextView enemyturn = findViewById(R.id.turn_textbox);
+        ImageView enemyimg = findViewById(R.id.enemy_img);
+
         enemyhp.setText(String.valueOf(enemy.getHp()));
         enemydmg.setText(String.valueOf(enemy.getDmg()));
         enemyturn.setText(String.valueOf(enemy.getTurn()));
+        enemyimg.setImageResource(enemy.getImgRes());
 
         // 적 HP 체크
         checkGameEndCondition();
@@ -331,14 +342,17 @@ public class Battle extends AppCompatActivity {
                     .setMessage(resultMessage)
                     .setPositiveButton("확인", (dialog, which) -> {
                         if (resultMessage.compareTo("승리!")==0) {
-                            // 승리 시: cleared true로 바꾸고 StageMapActivity로 이동
-                            ((GameApplication) getApplication()).getStageMap().getCurrentNode().setCleared(true);
-                            Intent intent = new Intent(Battle.this, StageMapActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
+                            if(app.getStageMap().getCurrentNode().getType() == StageNode.Type.NORMAL) {
+                                // 일반 전투 승리 시: cleared true로 바꾸고 StageMapActivity로 이동
+                                ((GameApplication) getApplication()).getStageMap().getCurrentNode().setCleared(true);
+                            }else if(app.getStageMap().getCurrentNode().getType() == StageNode.Type.BOSS){
+                                // 보스 전투 승리 시 : ending화면으로 가기
+                                Intent intent = new Intent(BattleActivity.this, EndingActivity.class);
+                                startActivity(intent);
+                            }
                         } else if (resultMessage.compareTo("패배!")==0) {
                             // 패배 시: MainActivity로 이동
-                            Intent intent = new Intent(Battle.this, MainActivity.class);
+                            Intent intent = new Intent(BattleActivity.this, MainActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(intent);
                         }
@@ -423,7 +437,7 @@ public class Battle extends AppCompatActivity {
                 .setMessage("메인 화면으로 돌아가시겠습니까?\n진행 중인 게임은 사라집니다.")
                 .setPositiveButton("예", (dialog, which) -> {
                     // 메인 액티비티를 새 작업으로 시작하면서 모든 기존 액티비티 제거
-                    Intent intent = new Intent(Battle.this, MainActivity.class);
+                    Intent intent = new Intent(BattleActivity.this, MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                 })

@@ -1,10 +1,10 @@
 package com.inhyung.fwp;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,34 +12,21 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class
-
-
-MainActivity extends AppCompatActivity {
-
-    private boolean allowTouch = false;
-
+public class EndingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        setContentView(R.layout.activity_ending);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.ending), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
-        Animation anim = AnimationUtils.loadAnimation(this, R.anim.blink);
-        findViewById(R.id.touchTostart).startAnimation(anim);
-
-        //일정시간 후 터치 허용
-        new android.os.Handler().postDelayed(() -> allowTouch = true, 500);
-
-        findViewById(R.id.main).setOnClickListener(e -> {
-            if (!allowTouch) return;
-            Intent intent = new Intent(this, SelDifficultyActivity.class);
+        findViewById(R.id.tomain).setOnClickListener(v -> {
+            Intent intent = new Intent(EndingActivity.this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         });
     }

@@ -126,7 +126,7 @@
                 android:id="@+id/enemy_img"
                 android:layout_width="240dp"
                 android:layout_height="136dp"
-                android:scaleType="centerCrop"
+                android:scaleType="fitCenter"
                 android:src="@drawable/enemy_sexy_p" />
 
             <TextView
@@ -135,6 +135,7 @@
                 android:layout_height="wrap_content"
                 android:text="EH"
                 android:textSize="24sp"
+                android:background="@color/white"
                 android:layout_gravity="bottom|right"/>
 
             <TextView
@@ -142,6 +143,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="ED"
+                android:background="@color/white"
                 android:textSize="24sp"
                 android:layout_gravity="bottom|left"
                 />

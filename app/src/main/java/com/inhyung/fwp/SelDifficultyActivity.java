@@ -11,7 +11,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class SelDifficulty extends AppCompatActivity {
+public class SelDifficultyActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +33,7 @@ public class SelDifficulty extends AppCompatActivity {
             GameApplication app = (GameApplication) getApplication();
             app.initPlayer(GameApplication.GameDifficulty.EASY); //플레이어 객체 새로 생성(리셋할 필요 X),application에 난이도 기록
             app.initStageMap(GameApplication.GameDifficulty.EASY);
-            Intent intent = new Intent(SelDifficulty.this, StageMapActivity.class);
+            Intent intent = new Intent(SelDifficultyActivity.this, StageMapActivity.class);
             startActivity(intent);
         });
     }

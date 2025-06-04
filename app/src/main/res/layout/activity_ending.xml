@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ending"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:alpha="50">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/enemy_farmer" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#66FFFFFF">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:text="농부로부터 해방되었습니다!"
+            android:textSize="50sp"
+            android:textAlignment="center"
+            android:layout_gravity="center"/>
+
+        <Button
+            android:id="@+id/tomain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="메인화면으로"
+            android:textSize="20sp"
+            android:layout_marginBottom="20sp"
+            android:layout_marginEnd="20sp"
+            android:layout_gravity="bottom|right"/>
+
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

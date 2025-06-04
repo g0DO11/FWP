@@ -14,13 +14,16 @@
         android:theme="@style/Theme.FWP"
         tools:targetApi="31">
         <activity
+            android:name=".EndingActivity"
+            android:exported="false" />
+        <activity
             android:name=".StageMapActivity"
             android:exported="false" />
         <activity
-            android:name=".SelDifficulty"
+            android:name=".SelDifficultyActivity"
             android:exported="false" />
         <activity
-            android:name=".Battle"
+            android:name=".BattleActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

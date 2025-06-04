@@ -3,23 +3,27 @@ package com.inhyung.fwp;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
-import android.widget.GridLayout;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class StageMapActivity extends AppCompatActivity {
-    private GridLayout stageGrid;
+    private FrameLayout stageFrame;
     private StageMap stageMap;
+    GameApplication app;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stage_map);
-
-        stageGrid = findViewById(R.id.stage_grid);
+        app = GameApplication.getInstance();
 
         // 1. 맵 데이터 불러오기
         stageMap = ((GameApplication) getApplication()).getStageMap();
@@ -29,44 +33,86 @@ public class StageMapActivity extends AppCompatActivity {
     }
 
     private void drawMap() {
-        stageGrid.removeAllViews();
+        FrameLayout nodeContainer = findViewById(R.id.node_container);
+        LineView lineView = findViewById(R.id.line_view);
+        nodeContainer.removeAllViews();
+        lineView.clearLines();
+
+        Map<Integer, View> nodeViews = new HashMap<>();
 
         for (StageNode node : stageMap.getNodes()) {
             Button btn = new Button(this);
             btn.setText(String.valueOf(node.getId()));
+            btn.setX(node.getX()); // JSON 좌표
+            btn.setY(node.getY());
+            btn.setLayoutParams(new FrameLayout.LayoutParams(160, 160));
 
             StageNode current = stageMap.getCurrentNode();
             if (node.getId() == current.getId()) {
-                btn.setBackgroundColor(Color.GREEN); // 현재 위치
+                btn.setBackgroundColor(Color.GREEN);
             } else if (node.getType() == StageNode.Type.BOSS) {
-                btn.setBackgroundColor(Color.RED); //보스
+                btn.setBackgroundColor(Color.RED);
+            } else if (node.getType() == StageNode.Type.RECOVER){
+                btn.setBackgroundColor(Color.BLUE);
             } else if (node.isAccessibleFrom(current)) {
-                btn.setBackgroundColor(Color.YELLOW); // 이동 가능한 노드
-            } else if (node.isCleared() || node.getType() == StageNode.Type.START){
-                btn.setBackgroundColor(Color.DKGRAY); // 클리어된 노드
-            } else if (!node.isCleared() && node.getType() != StageNode.Type.BOSS){
-                btn.setBackgroundColor(Color.GRAY); //보스가 아니면서 클리어되지 않은(갈 수 없는) 노드
+                btn.setBackgroundColor(Color.YELLOW);
+            }  else if (node.isCleared() || node.getType() == StageNode.Type.START) {
+                btn.setBackgroundColor(Color.DKGRAY);
+            } else {
+                btn.setBackgroundColor(Color.GRAY);
             }
 
             btn.setOnClickListener(v -> {
-                if (node.isAccessibleFrom(current)) {
-                    // 이동 처리
+                if (node.isAccessibleFrom(current)) { //이동 가능할 때
                     stageMap.moveTo(node.getId());
 
-                    // BattleActivity로 이동
-                    Intent intent = new Intent(this, Battle.class);
-                    intent.putExtra("nodeId", node.getId());
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(this, "접근 불가!", Toast.LENGTH_SHORT).show();
+                    if (node.getType() == StageNode.Type.NORMAL || node.getType() == StageNode.Type.BOSS) { //NORMAL이거나 BOSS일 때 Battle로 넘어감
+                        stageMap.moveTo(node.getId());
+                        Intent intent = new Intent(this, BattleActivity.class);
+                        intent.putExtra("nodeId", node.getId());
+                        startActivity(intent);
+                    } else if (node.getType() == StageNode.Type.RECOVER) {
+                        stageMap.moveTo(node.getId());
+                        new AlertDialog.Builder(this)
+                                .setTitle("체력 회복")
+                                .setMessage("체력이 50만큼 회복되었습니다.")
+                                .setPositiveButton("확인", (dialog, which) -> {
+                                    app.getPlayer().recoverHp(50);
+                                    drawMap();
+                                })
+                                .setCancelable(false)
+                                .show();
+                    }
+                } else { //이동이 불가능한 노드일 경우
+                    if (node.getId() == current.getId())
+                        Toast.makeText(this, "현재 위치입니다.", Toast.LENGTH_SHORT).show();
+                    else
+                        Toast.makeText(this, "접근 불가!", Toast.LENGTH_SHORT).show();
                 }
             });
 
-            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-            params.rowSpec = GridLayout.spec(node.getY());
-            params.columnSpec = GridLayout.spec(node.getX());
-            stageGrid.addView(btn, params);
+            nodeContainer.addView(btn);
+            nodeViews.put(node.getId(), btn);
         }
+
+        // 레이아웃 완료 후 중심 좌표로 선 그리기
+        nodeContainer.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            lineView.clearLines();  // 기존 선 초기화
+
+            for (StageNode node : stageMap.getNodes()) {
+                View from = nodeViews.get(node.getId());
+                float x1 = from.getX() + from.getWidth() / 2f;
+                float y1 = from.getY() + from.getHeight() / 2f;
+
+                for (int toId : node.getNextNodeIds()) {
+                    View to = nodeViews.get(toId);
+                    float x2 = to.getX() + to.getWidth() / 2f;
+                    float y2 = to.getY() + to.getHeight() / 2f;
+
+                    lineView.addLine(x1, y1, x2, y2);
+                }
+            }
+        });
     }
 
     @Override

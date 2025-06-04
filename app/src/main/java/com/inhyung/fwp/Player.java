@@ -24,6 +24,8 @@ public class Player {
         return hp;
     }
 
+    public void recoverHp(int recovery){ if(hp+recovery>maxHp) hp=maxHp; else hp+=recovery; }
+
     public int getMaxHp() {
         return maxHp;
     }
