@@ -33,6 +33,8 @@ public class GameApplication extends Application {
 
         switch (difficulty) {
             case EASY:
+                stageMaps = StageMapLoader.load(this);
+                currentStageMap = stageMaps.get(0);
                 break;
             case NORMAL:
                 break;

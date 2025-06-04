@@ -337,9 +337,17 @@ public class BattleActivity extends AppCompatActivity {
 
         if (resultMessage != null && !gameFinished) {
             gameFinished=true;
+
+            String dialogMSG = resultMessage;
+            if(resultMessage.compareTo("승리!")==0){
+                dialogMSG+="\n"+enemy.getName()+"을(를) 해치웠습니다!\n보상으로 "+enemy.getReward()+" 골드를 받았습니다.";
+            }else if (resultMessage.compareTo("패배!")==0){
+                dialogMSG+="\n"+enemy.getName()+"에게 졌습니다.\n메인 화면으로 돌아갑니다.";
+            }
+
             new AlertDialog.Builder(this)
                     .setTitle("게임 결과")
-                    .setMessage(resultMessage)
+                    .setMessage(dialogMSG)
                     .setPositiveButton("확인", (dialog, which) -> {
                         if (resultMessage.compareTo("승리!")==0) {
                             if(app.getStageMap().getCurrentNode().getType() == StageNode.Type.NORMAL) {
