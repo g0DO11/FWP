@@ -124,7 +124,7 @@ public class StageMapActivity extends AppCompatActivity {
         if (target == null) return;
 
         float centerX = target.getX() + target.getWidth() / 2f - playerIcon.getWidth() / 2f;
-        float centerY = target.getY() + target.getHeight() / 2f - playerIcon.getHeight() / 2f;
+        float centerY = target.getY() + target.getHeight() / 2f - playerIcon.getHeight();
 
         playerIcon.animate()
                 .x(centerX)
@@ -139,7 +139,7 @@ public class StageMapActivity extends AppCompatActivity {
         if (target == null) return;
 
         float centerX = target.getX() + target.getWidth() / 2f - playerIcon.getWidth() / 2f;
-        float centerY = target.getY() + target.getHeight() / 2f - playerIcon.getHeight() / 2f;
+        float centerY = target.getY() + target.getHeight() / 2f - playerIcon.getHeight();
 
         playerIcon.setX(centerX);
         playerIcon.setY(centerY);

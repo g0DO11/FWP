@@ -16,11 +16,12 @@
 
     <ImageView
         android:id="@+id/player_icon"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:src="@drawable/ppotato"
-        android:scaleType="centerInside"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_gravity="top|start"
+        android:scaleType="centerInside"
+        android:scaleX="-1"
+        android:src="@drawable/ppotato"
         android:translationZ="10dp" />
 
 </FrameLayout>
