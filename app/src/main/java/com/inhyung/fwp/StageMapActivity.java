@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -15,14 +16,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StageMapActivity extends AppCompatActivity {
-    private FrameLayout stageFrame;
+    private ImageView playerIcon;
     private StageMap stageMap;
     GameApplication app;
+    Map<Integer, View> nodeViews = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stage_map);
+        playerIcon = findViewById(R.id.player_icon);
         app = GameApplication.getInstance();
 
         // 1. 맵 데이터 불러오기
@@ -37,8 +40,6 @@ public class StageMapActivity extends AppCompatActivity {
         LineView lineView = findViewById(R.id.line_view);
         nodeContainer.removeAllViews();
         lineView.clearLines();
-
-        Map<Integer, View> nodeViews = new HashMap<>();
 
         for (StageNode node : stageMap.getNodes()) {
             Button btn = new Button(this);
@@ -66,23 +67,23 @@ public class StageMapActivity extends AppCompatActivity {
                 if (node.isAccessibleFrom(current)) { //이동 가능할 때
                     stageMap.moveTo(node.getId());
 
-                    if (node.getType() == StageNode.Type.NORMAL || node.getType() == StageNode.Type.BOSS) { //NORMAL이거나 BOSS일 때 Battle로 넘어감
-                        stageMap.moveTo(node.getId());
-                        Intent intent = new Intent(this, BattleActivity.class);
-                        intent.putExtra("nodeId", node.getId());
-                        startActivity(intent);
-                    } else if (node.getType() == StageNode.Type.RECOVER) {
-                        stageMap.moveTo(node.getId());
-                        new AlertDialog.Builder(this)
-                                .setTitle("체력 회복")
-                                .setMessage("체력이 50만큼 회복되었습니다.")
-                                .setPositiveButton("확인", (dialog, which) -> {
-                                    app.getPlayer().recoverHp(50);
-                                    drawMap();
-                                })
-                                .setCancelable(false)
-                                .show();
-                    }
+                    movePlayerTo(node, () -> {
+                        if (node.getType() == StageNode.Type.NORMAL || node.getType() == StageNode.Type.BOSS) {
+                            Intent intent = new Intent(this, BattleActivity.class);
+                            intent.putExtra("nodeId", node.getId());
+                            startActivity(intent);
+                        } else if (node.getType() == StageNode.Type.RECOVER) {
+                            new AlertDialog.Builder(this)
+                                    .setTitle("체력 회복")
+                                    .setMessage("체력이 50만큼 회복되었습니다.")
+                                    .setPositiveButton("확인", (dialog, which) -> {
+                                        app.getPlayer().recoverHp(50);
+                                        drawMap(); // 회복 후 다시 맵 갱신
+                                    })
+                                    .setCancelable(false)
+                                    .show();
+                        }
+                    });
                 } else { //이동이 불가능한 노드일 경우
                     if (node.getId() == current.getId())
                         Toast.makeText(this, "현재 위치입니다.", Toast.LENGTH_SHORT).show();
@@ -112,7 +113,36 @@ public class StageMapActivity extends AppCompatActivity {
                     lineView.addLine(x1, y1, x2, y2);
                 }
             }
+
+            StageNode current = stageMap.getCurrentNode();
+            placePlayer(current);
         });
+    }
+
+    private void movePlayerTo(StageNode node, Runnable onEnd) {
+        View target = nodeViews.get(node.getId());
+        if (target == null) return;
+
+        float centerX = target.getX() + target.getWidth() / 2f - playerIcon.getWidth() / 2f;
+        float centerY = target.getY() + target.getHeight() / 2f - playerIcon.getHeight() / 2f;
+
+        playerIcon.animate()
+                .x(centerX)
+                .y(centerY)
+                .setDuration(500)
+                .withEndAction(onEnd)
+                .start();
+    }
+
+    private void placePlayer(StageNode node) {
+        View target = nodeViews.get(node.getId());
+        if (target == null) return;
+
+        float centerX = target.getX() + target.getWidth() / 2f - playerIcon.getWidth() / 2f;
+        float centerY = target.getY() + target.getHeight() / 2f - playerIcon.getHeight() / 2f;
+
+        playerIcon.setX(centerX);
+        playerIcon.setY(centerY);
     }
 
     @Override

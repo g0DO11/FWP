@@ -248,6 +248,9 @@ public class BattleActivity extends AppCompatActivity {
 
             enemy.takeDamage(damage);
 
+            //공격 후 족보 데미지 리셋
+            family_damage_textbox.setText("카드를 선택하세요!");
+
             //플레이어가 공격 후 적 체력 확인
             checkGameEndCondition();
             if (gameFinished) return;

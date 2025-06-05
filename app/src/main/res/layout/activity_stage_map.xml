@@ -14,4 +14,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <ImageView
+        android:id="@+id/player_icon"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/ppotato"
+        android:scaleType="centerInside"
+        android:layout_gravity="top|start"
+        android:translationZ="10dp" />
+
 </FrameLayout>
